@@ -1,0 +1,16 @@
+certifi==2019.3.9
+chardet==3.0.4
+Django==2.1.7
+djangorestframework==3.9.2
+docopt==0.6.2
+get==2019.3.22
+idna==2.8
+mysqlclient==1.4.2
+pipreqs==0.4.9
+post==2019.3.22
+public==2019.3.22
+pytz==2018.9
+query-string==2019.3.22
+requests==2.21.0
+urllib3==1.24.1
+yarg==0.1.9
