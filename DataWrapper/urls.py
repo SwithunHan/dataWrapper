@@ -17,11 +17,9 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 
-from office.views import OfficeListViewSet, CompanyOfAreaViewSet
 
 routers = DefaultRouter()
-routers.register(r'office', OfficeListViewSet, base_name="office")
-routers.register(r'companyofarea', CompanyOfAreaViewSet, base_name="companyofarea")
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
