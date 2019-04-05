@@ -78,7 +78,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': "datawrapper",
         'USER': "root",
-        'PASSWORD': '12348564',
+        'PASSWORD': '12333336644464444',
         'HOST': "127.0.0.1",
         'OPTIONS': {'init_command': "SET default_storage_engine=INNODB;"}
     }
