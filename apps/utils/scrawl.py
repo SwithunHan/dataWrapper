@@ -6,7 +6,7 @@ from DataWrapper.settings import REGIONLIST, CITY
 
 def get_communitylist(city):
     res = []
-    for community in models.Community.select():
+    for community in models.Community.objects.all():
         if community.city == city:
             res.append(community.title)
     return res
