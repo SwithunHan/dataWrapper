@@ -27,6 +27,10 @@ class Community(models.Model):
 
     validdate = models.DateTimeField(default=datetime.datetime.now, verbose_name="添加时间")
 
+    class Meta:
+        verbose_name = "小区"
+        verbose_name_plural = verbose_name
+
 
 class Houseinfo(models.Model):
     """
@@ -35,7 +39,7 @@ class Houseinfo(models.Model):
     houseID = models.CharField(max_length=50, primary_key=True, verbose_name="房子id")
     title = models.CharField(max_length=50, verbose_name="房子名称")
     link = models.CharField(max_length=50, verbose_name="房子链接")
-    community = models.ForeignKey(Community, on_delete=models.CASCADE)
+    community = models.ForeignKey(Community, on_delete=models.CASCADE,verbose_name="小区名称")
     years = models.IntegerField(verbose_name="建成时间")
     housetype = models.CharField(max_length=50, verbose_name="房屋类型")
     square = models.CharField(max_length=50, verbose_name="房屋面积")
@@ -48,10 +52,14 @@ class Houseinfo(models.Model):
     decoration = models.CharField(max_length=50, verbose_name="装饰类型")
     validdate = models.DateTimeField(default=datetime.datetime.now)
 
+    class Meta:
+        verbose_name = "在售房源信息"
+        verbose_name_plural = verbose_name
+
 
 class Sellinfo(models.Model):
     """
-    成交信息信息
+    成交房源信息
     """
     houseID = models.IntegerField(primary_key=True, verbose_name="房屋id")
     title = models.CharField(max_length=50, verbose_name="房子名称")
@@ -66,6 +74,10 @@ class Sellinfo(models.Model):
     unitPrice = models.FloatField(verbose_name="每平米价格")
     dealdate = models.CharField(max_length=50, null=True, verbose_name="成交时间")
     updatedate = models.DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        verbose_name = "成交房源信息"
+        verbose_name_plural = verbose_name
 
 
 class Rentinfo(models.Model):
@@ -85,3 +97,7 @@ class Rentinfo(models.Model):
     price = models.CharField(max_length=50, verbose_name="单价")
     housetype = models.CharField(max_length=50, verbose_name="户型")
     updatedate = models.DateTimeField(default=datetime.datetime.now)
+
+    class Meta:
+        verbose_name = "租房信息"
+        verbose_name_plural = verbose_name
