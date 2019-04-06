@@ -51,9 +51,8 @@ class Houseinfo(models.Model):
     followInfo = models.CharField(max_length=50, verbose_name="关注数")
     decoration = models.CharField(max_length=50, verbose_name="装饰类型")
     validdate = models.DateTimeField(default=datetime.now)
-    houseState = models.CharField(max_length=50, verbose_name='房源状态',default='在售')
-    updatedate = models.DateTimeField(default=datetime.now,verbose_name='成交时间')
-
+    houseState = models.CharField(max_length=50, verbose_name='房源状态', default='在售')
+    updatedate = models.DateTimeField(default=datetime.now, verbose_name='成交时间')
 
     class Meta:
         verbose_name = "在售房源信息"
