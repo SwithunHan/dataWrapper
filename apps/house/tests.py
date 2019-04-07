@@ -4,30 +4,20 @@ import django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'DataWrapper.settings')
 django.setup()
 
+dict = {'title': 'DBC加州小镇.南北通透三居室.户型方正.明厨明卫', 'link': 'https://bj.lianjia.com/ershoufang/101103476452.html',
+        'community': 'DBC加州小镇C区', 'housetype': '3室2厅', 'square': 130.99, 'direction': '南 北', 'decoration': '简装',
+        'floor': '中楼层(共15层)', 'years': 2010, 'followInfo': '69人关注/26次带看VR房源房本满五年随时看房629万单价48019元/平米',
+        'taxtype': 'VR房源房本满五年随时看房', 'totalPrice': 629.0, 'unitPrice': 48019.0, 'houseID': 101103476452}
 
-def main():
+dict1 = {'houseID': 101103742980, 'totalPrice': 565.0}
+
+def main(dict):
     from house import models
-    models.Community.objects.create(**{
-        'id': 1,
-        'title': "贵园南里丁区",
-        'link': "/admin",
-        'district': "犯得上广泛士大夫",
-        'bizcircle': "三个股东身份",
-        'tagList': "的故事非官方",
-        'onsale': 666,
-        'onrent': 555,
-        'year': 1005,
-        'housetype': "两室一厅",
-        'cost': "5-3",
-        'service': "法国电视公司",
-        'company': "的事告诉对方",
-        'building_num': 55,
-        'house_num': 1000,
-        'price': 10,
-        'city': "bj"
-    })
+    community = models.Community.objects.get(title=dict['community'])
+    print(dict['community'])
+    dict['community'] = community
+    models.Houseinfo.objects.create(**dict)
 
 
-if __name__ == '__main__':
-    main()
-    print("Done....")
+main(dict)
+print("Done....")

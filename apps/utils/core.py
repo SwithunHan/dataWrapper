@@ -1,18 +1,26 @@
 # -*- coding: utf-8 -*-
+import os
+import re
+
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'DataWrapper.settings')
+django.setup()
+
 from bs4 import BeautifulSoup
 from house import models
 import time
 import datetime
 import urllib.request
 import logging
-
 from utils import misc
+from .insert_sql import insertCommunity, insertHouseinfo, insertRentinfo, insertHisprice
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s', level=logging.INFO)
 
 
-#根据行政区获取小区列表函数打印日志
+# 根据行政区获取小区列表函数打印日志
 def GetCommunityByRegionlist(city, regionlist=[u'xicheng']):
     logging.info("Get Community Infomation")
     starttime = datetime.datetime.now()
@@ -26,7 +34,9 @@ def GetCommunityByRegionlist(city, regionlist=[u'xicheng']):
             pass
     endtime = datetime.datetime.now()
     logging.info("Run time: " + str(endtime - starttime))
-#获取小区列表
+
+
+# 获取小区列表
 def get_community_perregion(city, regionname=u'xicheng'):
     baseUrl = u"http://%s.lianjia.com/" % (city)
     url = baseUrl + u"xiaoqu/" + regionname + "/"
@@ -73,32 +83,52 @@ def get_community_perregion(city, regionname=u'xicheng'):
 
                 onsale = name.find("a", {"class": "totalSellCount"})
                 info_dict.update(
-                    {u'onsale': onsale.span.get_text().strip('\n')})
+                    {u'onsale': int(onsale.span.get_text().strip('\n'))})
 
                 onrent = name.find("a", {"title": title + u"租房"})
                 info_dict.update(
-                    {u'onrent': onrent.get_text().strip('\n').split(u'套')[0]})
+                    {u'onrent': int(onrent.get_text().strip('\n').split(u'套')[0])})
 
-                info_dict.update({u'id': name.get('data-housecode')})
+                info_dict.update({u'id': int(name.get('data-housecode'))})
 
                 price = name.find("div", {"class": "totalPrice"})
-                info_dict.update({u'price': price.span.get_text().strip('\n')})
+                info_dict.update({u'price': int(price.span.get_text().strip('\n'))})
 
                 communityinfo = get_communityinfo_by_url(link)
                 for key, value in communityinfo.items():
-                    info_dict.update({key: value})
+                    if key == "year":
+                        info_dict.update({key: int(re.findall('(\d+)', value)[0])})
+
+                    elif key == 'building_num':
+                        info_dict.update({key: int(re.findall('(\d+)', value)[0])})
+
+                    elif key == 'house_num':
+                        info_dict.update({key: int(re.findall('(\d+)', value)[0])})
+                    else:
+                        info_dict.update({key: value})
 
                 info_dict.update({u'city': city})
+                # print(info_dict)
             except:
                 continue
             # communityinfo insert into mysql
             data_source.append(info_dict)
-            # model.Community.insert(**info_dict).upsert().execute()
-        with models.database.atomic():
-            if data_source:
-                models.Community.insert_many(data_source).upsert().execute()
+            # print(data_source)
+            # community(info_dict)
+            # models.Community.insert(**info_dict)
+        for data in data_source:
+            try:
+                insertCommunity(data)
+            except:
+                continue
+
+        # with models.database.atomic():
+        #     if data_source:
+        #         models.Community.insert_many(data_source).upsert().execute()
         time.sleep(1)
-#获取小区详细信息列表
+
+
+# 获取小区详细信息列表
 def get_communityinfo_by_url(url):
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
@@ -130,7 +160,7 @@ def get_communityinfo_by_url(url):
     return res
 
 
-#根据小区爬取在售房源信息
+# 根据小区爬取在售房源信息
 def GetHouseByCommunitylist(city, communitylist):
     logging.info("Get House Infomation")
     starttime = datetime.datetime.now()
@@ -143,10 +173,12 @@ def GetHouseByCommunitylist(city, communitylist):
             pass
     endtime = datetime.datetime.now()
     logging.info("Run time: " + str(endtime - starttime))
+
+
 def get_house_percommunity(city, communityname):
     baseUrl = u"http://%s.lianjia.com/" % (city)
     url = baseUrl + u"ershoufang/rs" + \
-        urllib.request.quote(communityname.encode('utf8')) + "/"
+          urllib.request.quote(communityname.encode('utf8')) + "/"
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
 
@@ -161,8 +193,8 @@ def get_house_percommunity(city, communityname):
     for page in range(total_pages):
         if page > 0:
             url_page = baseUrl + \
-                u"ershoufang/pg%drs%s/" % (page,
-                                           urllib.request.quote(communityname.encode('utf8')))
+                       u"ershoufang/pg%drs%s/" % (page,
+                                                  urllib.request.quote(communityname.encode('utf8')))
             source_code = misc.get_source_code(url_page)
             soup = BeautifulSoup(source_code, 'lxml')
 
@@ -187,15 +219,16 @@ def get_house_percommunity(city, communityname):
                     info = houseaddr.div.get_text().split('|')
                 info_dict.update({u'community': communityname})
                 info_dict.update({u'housetype': info[1].strip()})
-                info_dict.update({u'square': info[2].strip()})
+                info_dict.update({u'square': float(re.findall(r'(.*?)[\u4e00-\u9fa5]+', info[2].strip())[0])})
                 info_dict.update({u'direction': info[3].strip()})
                 info_dict.update({u'decoration': info[4].strip()})
 
                 housefloor = name.find("div", {"class": "flood"})
                 floor_all = housefloor.div.get_text().split(
                     '-')[0].strip().split(' ')
-                info_dict.update({u'floor': floor_all[0].strip()})
-                info_dict.update({u'years': floor_all[-1].strip()})
+                info_dict.update({u'floor': re.findall(r'(.*?)/.*?/.*?', floor_all[0].strip())[0]})
+                info_dict.update(
+                    {u'years': int(re.findall(r'.*?/(\d+)[\u4e00-\u9fa5]+/.*?', floor_all[-1].strip())[0])})
 
                 followInfo = name.find("div", {"class": "followInfo"})
                 info_dict.update({u'followInfo': followInfo.get_text()})
@@ -204,30 +237,48 @@ def get_house_percommunity(city, communityname):
                 info_dict.update({u'taxtype': tax.get_text().strip()})
 
                 totalPrice = name.find("div", {"class": "totalPrice"})
-                info_dict.update({u'totalPrice': totalPrice.span.get_text()})
-
+                info_dict.update({u'totalPrice': float(totalPrice.span.get_text())}
+                                 )
                 unitPrice = name.find("div", {"class": "unitPrice"})
-                info_dict.update({u'unitPrice': unitPrice.get('data-price')})
-                info_dict.update({u'houseID': unitPrice.get('data-hid')})
+                info_dict.update({u'unitPrice': float(unitPrice.get('data-price'))})
+                info_dict.update({u'houseID': int(unitPrice.get('data-hid'))})
+                # print(info_dict)
             except:
                 continue
             # houseinfo insert into mysql
             data_source.append(info_dict)
             hisprice_data_source.append(
                 {"houseID": info_dict["houseID"], "totalPrice": info_dict["totalPrice"]})
-            # model.Houseinfo.insert(**info_dict).upsert().execute()
-            #model.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert().execute()
+            print(hisprice_data_source)
+        for data in data_source:
+            try:
+                if data[u'community'] in models.Community.objects.all():
+                    insertHouseinfo(data)
+            except:
+                continue
+            # print(data_source)
 
-        with models.database.atomic():
-            if data_source:
-                models.Houseinfo.insert_many(data_source).upsert().execute()
-            if hisprice_data_source:
-                models.Hisprice.insert_many(
-                    hisprice_data_source).upsert().execute()
+            # models.Houseinfo.insert(**info_dict).upsert().execute()
+
+        for data in hisprice_data_source:
+            try:
+                insertHisprice(data)
+            except:
+                continue
+
+        # models.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert(
+        # ).execute()
+
+        # with models.database.atomic():
+        #     if data_source:
+        #         models.Houseinfo.insert_many(data_source).upsert().execute()
+        #     if hisprice_data_source:
+        #         models.Hisprice.insert_many(
+        #             hisprice_data_source).upsert().execute()
         time.sleep(1)
 
 
-#根据小区爬成交房源信息
+# 根据小区爬成交房源信息
 def GetSellByCommunitylist(city, communitylist):
     logging.info("Get Sell Infomation")
     starttime = datetime.datetime.now()
@@ -240,10 +291,12 @@ def GetSellByCommunitylist(city, communitylist):
             pass
     endtime = datetime.datetime.now()
     logging.info("Run time: " + str(endtime - starttime))
+
+
 def get_sell_percommunity(city, communityname):
     baseUrl = u"http://%s.lianjia.com/" % (city)
     url = baseUrl + u"chengjiao/rs" + \
-        urllib.request.quote(communityname.encode('utf8')) + "/"
+          urllib.request.quote(communityname.encode('utf8')) + "/"
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
 
@@ -258,8 +311,8 @@ def get_sell_percommunity(city, communityname):
     for page in range(total_pages):
         if page > 0:
             url_page = baseUrl + \
-                u"chengjiao/pg%drs%s/" % (page,
-                                          urllib.request.quote(communityname.encode('utf8')))
+                       u"chengjiao/pg%drs%s/" % (page,
+                                                 urllib.request.quote(communityname.encode('utf8')))
             source_code = misc.get_source_code(url_page)
             soup = BeautifulSoup(source_code, 'lxml')
 
@@ -275,42 +328,46 @@ def get_sell_percommunity(city, communityname):
                     info_dict.update({u'link': housetitle.a.get('href')})
                     houseID = housetitle.a.get(
                         'href').split("/")[-1].split(".")[0]
-                    info_dict.update({u'houseID': houseID.strip()})
+                    info_dict.update({u'houseID': int(houseID.strip())})
 
                     house = housetitle.get_text().strip().split(' ')
+
                     info_dict.update({u'community': communityname})
                     info_dict.update(
                         {u'housetype': house[1].strip() if 1 < len(house) else ''})
                     info_dict.update(
-                        {u'square': house[2].strip() if 2 < len(house) else ''})
+                        {u'square': float(re.findall('(.*?)[\u4e00-\u9fa5]+', house[2].strip())[0]) if 2 < len(
+                            house) else None})
 
                     houseinfo = name.find("div", {"class": "houseInfo"})
                     info = houseinfo.get_text().split('|')
                     info_dict.update({u'direction': info[0].strip()})
                     info_dict.update(
-                        {u'status': info[1].strip() if 1 < len(info) else ''})
+                        {u'decoration': info[1].strip() if 1 < len(info) else ''})
 
                     housefloor = name.find("div", {"class": "positionInfo"})
                     floor_all = housefloor.get_text().strip().split(' ')
                     info_dict.update({u'floor': floor_all[0].strip()})
                     info_dict.update({u'years': floor_all[-1].strip()})
 
-                    followInfo = name.find("div", {"class": "source"})
-                    info_dict.update(
-                        {u'source': followInfo.get_text().strip()})
+                    dealHouse = name.find("span",{"class":"dealHouseTxt"})
+                    taxtype = dealHouse.span.get_text()
+                    info_dict.update({u'taxtype':taxtype})
+                    # info_dict.update({u'subway':dealHouseTxt.span.get_text()[1].strip()})
+
 
                     totalPrice = name.find("div", {"class": "totalPrice"})
                     if totalPrice.span is None:
                         info_dict.update(
-                            {u'totalPrice': totalPrice.get_text().strip()})
+                            {u'totalPrice': 0})
                     else:
                         info_dict.update(
-                            {u'totalPrice': totalPrice.span.get_text().strip()})
+                            {u'totalPrice': float(totalPrice.span.get_text().strip())})
 
                     unitPrice = name.find("div", {"class": "unitPrice"})
                     if unitPrice.span is None:
                         info_dict.update(
-                            {u'unitPrice': unitPrice.get_text().strip()})
+                            {u'unitPrice': 0})
                     else:
                         info_dict.update(
                             {u'unitPrice': unitPrice.span.get_text().strip()})
@@ -318,20 +375,27 @@ def get_sell_percommunity(city, communityname):
                     dealDate = name.find("div", {"class": "dealDate"})
                     info_dict.update(
                         {u'dealdate': dealDate.get_text().strip().replace('.', '-')})
-
+                    # print(info_dict)
+                    info_dict.update({u'houseState': u'成交'})
+                    # print(info_dict)
                 except:
                     continue
                 # Sellinfo insert into mysql
                 data_source.append(info_dict)
                 # model.Sellinfo.insert(**info_dict).upsert().execute()
+        for data in data_source:
+            try:
+                insertHouseinfo(data)
+            except:
+                continue
 
-        with models.database.atomic():
-            if data_source:
-                models.Sellinfo.insert_many(data_source).upsert().execute()
+        # with models.database.atomic():
+        #     if data_source:
+        #         models.Sellinfo.insert_many(data_source).upsert().execute()
         time.sleep(1)
 
 
-#根据小区爬租房信息
+# 根据小区爬租房信息
 def GetRentByCommunitylist(city, communitylist):
     logging.info("Get Rent Infomation")
     starttime = datetime.datetime.now()
@@ -344,10 +408,12 @@ def GetRentByCommunitylist(city, communitylist):
             pass
     endtime = datetime.datetime.now()
     logging.info("Run time: " + str(endtime - starttime))
+
+
 def get_rent_percommunity(city, communityname):
     baseUrl = u"http://%s.lianjia.com/" % (city)
     url = baseUrl + u"zufang/rs" + \
-        urllib.request.quote(communityname.encode('utf8')) + "/"
+          urllib.request.quote(communityname.encode('utf8')) + "/"
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
 
@@ -362,8 +428,8 @@ def get_rent_percommunity(city, communityname):
     for page in range(total_pages):
         if page > 0:
             url_page = baseUrl + \
-                u"rent/pg%drs%s/" % (page,
-                                     urllib.request.quote(communityname.encode('utf8')))
+                       u"rent/pg%drs%s/" % (page,
+                                            urllib.request.quote(communityname.encode('utf8')))
             source_code = misc.get_source_code(url_page)
             soup = BeautifulSoup(source_code, 'lxml')
         i = 0
@@ -432,8 +498,7 @@ def get_rent_percommunity(city, communityname):
         time.sleep(1)
 
 
-
-#根据行政区爬取房源信息
+# 根据行政区爬取房源信息
 def GetHouseByRegionlist(city, regionlist=[u'xicheng']):
     starttime = datetime.datetime.now()
     for regionname in regionlist:
@@ -445,6 +510,8 @@ def GetHouseByRegionlist(city, regionlist=[u'xicheng']):
             pass
     endtime = datetime.datetime.now()
     logging.info("Run time: " + str(endtime - starttime))
+
+
 def get_house_perregion(city, district):
     baseUrl = u"http://%s.lianjia.com/" % (city)
     url = baseUrl + u"ershoufang/%s/" % district
@@ -519,7 +586,7 @@ def get_house_perregion(city, district):
                 hisprice_data_source.append(
                     {"houseID": info_dict["houseID"], "totalPrice": info_dict["totalPrice"]})
                 # model.Houseinfo.insert(**info_dict).upsert().execute()
-                #model.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert().execute()
+                # model.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert().execute()
 
         with models.database.atomic():
             if data_source:
@@ -529,7 +596,8 @@ def get_house_perregion(city, district):
                     hisprice_data_source).upsert().execute()
         time.sleep(1)
 
-#根据行政区爬取租房信息
+
+# 根据行政区爬取租房信息
 def GetRentByRegionlist(city, regionlist=[u'xicheng']):
     starttime = datetime.datetime.now()
     for regionname in regionlist:
@@ -541,6 +609,8 @@ def GetRentByRegionlist(city, regionlist=[u'xicheng']):
             pass
     endtime = datetime.datetime.now()
     logging.info("Run time: " + str(endtime - starttime))
+
+
 def get_rent_perregion(city, district):
     baseUrl = u"http://%s.lianjia.com/" % (city)
     url = baseUrl + u"zufang/%s/" % district
@@ -626,7 +696,7 @@ def get_rent_perregion(city, district):
         time.sleep(1)
 
 
-#检验ip是否禁
+# 检验ip是否禁
 def check_block(soup):
     if soup.title.string == "414 Request-URI Too Large":
         logging.error(
@@ -634,7 +704,8 @@ def check_block(soup):
         return True
     return False
 
-#日志
+
+# 日志
 def log_progress(function, address, page, total):
     logging.info("Progress: %s %s: current page %d total pages %d" %
                  (function, address, page, total))
