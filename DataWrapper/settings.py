@@ -36,7 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'house.apps.HouseConfig'
+    'house.apps.HouseConfig',
 ]
 
 MIDDLEWARE = [
@@ -120,4 +120,5 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 CITY = 'bj'  # only one, shanghai=sh shenzhen=sh......
-REGIONLIST = [u'fengtai', u'tongzhou']  # only pinyin support
+REGIONLIST = [u'dongcheng',u'xicheng',u'chaoyang',u'haidian',u'fengtai',u'shijingshan',u'changping',u'daxing',u'yizhuangkaifaqu',u'shunyi',u'fangshan'
+    ,u'mentougou',u'pinggu',u'huairou',u'tongzhou',u'miyun',u'yanqing',u'yanjiao',u'xianghe',u'guangyang',u'anci',u'langfangjingjijishu',u'guan']  # only pinyin support
