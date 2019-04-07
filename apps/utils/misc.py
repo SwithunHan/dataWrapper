@@ -63,7 +63,7 @@ def get_total_pages(url):
 
     # if it doesnot get total page, then return default value 50
     if page_info == None:
-        return 50
+        return 1
     # '{"totalPage":5,"curPage":1}'
     page_info_str = page_info.get('page-data').split(',')[0]
     total_pages = int(page_info_str.split(':')[1])
@@ -80,7 +80,7 @@ def get_sh_total_pages(url):
         page_info = None
 
     if page_info == None:
-        return 1
+        return 10
     # <a href="/xiaoqu/putuo/d58" gahref="results_totalpage">58</a>
     total_pages = int(page_info.get_text().strip(''))
     return total_pages
