@@ -14,15 +14,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
-
+from rest_framework.documentation import include_docs_urls
+from house.views import HouseViewSet,CommunityViewSet
 
 routers = DefaultRouter()
-
+routers.register(r'houselist', HouseViewSet, base_name="houselist")
+routers.register(r'community', CommunityViewSet, base_name="community")
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('', include(routers.urls)),
-    path(r'api-auth/', include('rest_framework.urls')),
+    # xadmin url
+    url(r'^admin/', admin.site.urls),
+    # 图片路径
+    url(r'^', include(routers.urls)),
+    # 项目文档
+    url(r'^docs/', include_docs_urls(title="项目文档")),
+    # api登录
+    url(r'^api-auth/', include('rest_framework.urls')),
 ]
