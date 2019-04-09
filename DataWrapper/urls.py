@@ -17,11 +17,12 @@ from django.contrib import admin
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
 from rest_framework.documentation import include_docs_urls
-from house.views import HouseViewSet,CommunityViewSet
+from house.views import HouseViewSet, CommunityViewSet, DistributionViewSet
 
 routers = DefaultRouter()
 routers.register(r'houselist', HouseViewSet, base_name="houselist")
 routers.register(r'community', CommunityViewSet, base_name="community")
+routers.register(r'distribution', DistributionViewSet, base_name="community")
 
 urlpatterns = [
     # xadmin url

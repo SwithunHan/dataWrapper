@@ -22,9 +22,23 @@ class RentinfoSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class CommunityTitleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Community
+        fields = ("title",)
+
+
 class HouseinfoSerializer(serializers.ModelSerializer):
-    community = CommunitySerializer()
+    community = CommunityTitleSerializer()
 
     class Meta:
         model = Houseinfo
         fields = "__all__"
+
+
+class DistrictSerializer(serializers.ModelSerializer):
+    num = serializers.IntegerField()
+
+    class Meta:
+        model = Community
+        fields = ("district", "num")
