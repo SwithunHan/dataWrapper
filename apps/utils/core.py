@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 import re
-
+from datetime import datetime
 import django
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'DataWrapper.settings')
@@ -234,7 +234,7 @@ def get_house_percommunity(city, communityname):
                 info_dict.update({u'followInfo': followInfo.get_text()})
 
                 tax = name.find("div", {"class": "tag"})
-                info_dict.update({u'taxtype': tax.get_text().strip()})
+                info_dict.update({u'tag': tax.get_text().strip()})
 
                 totalPrice = name.find("div", {"class": "totalPrice"})
                 info_dict.update({u'totalPrice': float(totalPrice.span.get_text())}
@@ -249,11 +249,10 @@ def get_house_percommunity(city, communityname):
             data_source.append(info_dict)
             hisprice_data_source.append(
                 {"houseID": info_dict["houseID"], "totalPrice": info_dict["totalPrice"]})
-            print(hisprice_data_source)
+            # print(hisprice_data_source)
         for data in data_source:
             try:
-                if data[u'community'] in models.Community.objects.all():
-                    insertHouseinfo(data)
+                insertHouseinfo(data)
             except:
                 continue
             # print(data_source)
@@ -324,64 +323,98 @@ def get_sell_percommunity(city, communityname):
                 info_dict = {}
                 try:
                     housetitle = name.find("div", {"class": "title"})
-                    info_dict.update({u'title': housetitle.get_text().strip()})
-                    info_dict.update({u'link': housetitle.a.get('href')})
-                    houseID = housetitle.a.get(
-                        'href').split("/")[-1].split(".")[0]
-                    info_dict.update({u'houseID': int(houseID.strip())})
-
-                    house = housetitle.get_text().strip().split(' ')
-
-                    info_dict.update({u'community': communityname})
-                    info_dict.update(
-                        {u'housetype': house[1].strip() if 1 < len(house) else ''})
-                    info_dict.update(
-                        {u'square': float(re.findall('(.*?)[\u4e00-\u9fa5]+', house[2].strip())[0]) if 2 < len(
-                            house) else None})
-
-                    houseinfo = name.find("div", {"class": "houseInfo"})
-                    info = houseinfo.get_text().split('|')
-                    info_dict.update({u'direction': info[0].strip()})
-                    info_dict.update(
-                        {u'decoration': info[1].strip() if 1 < len(info) else ''})
-
-                    housefloor = name.find("div", {"class": "positionInfo"})
-                    floor_all = housefloor.get_text().strip().split(' ')
-                    info_dict.update({u'floor': floor_all[0].strip()})
-                    info_dict.update({u'years': floor_all[-1].strip()})
-
-                    dealHouse = name.find("span",{"class":"dealHouseTxt"})
-                    taxtype = dealHouse.span.get_text()
-                    info_dict.update({u'taxtype':taxtype})
-                    # info_dict.update({u'subway':dealHouseTxt.span.get_text()[1].strip()})
-
-
-                    totalPrice = name.find("div", {"class": "totalPrice"})
-                    if totalPrice.span is None:
-                        info_dict.update(
-                            {u'totalPrice': 0})
+                    if housetitle.get_text().strip().split()[1] == '车位':
+                        continue
                     else:
-                        info_dict.update(
-                            {u'totalPrice': float(totalPrice.span.get_text().strip())})
+                        info_dict.update({u'title': housetitle.get_text().strip()})
+                        info_dict.update({u'link': housetitle.a.get('href')})
+                        houseID = housetitle.a.get(
+                            'href').split("/")[-1].split(".")[0]
+                        if 'B' in list(houseID.strip()):
+                            info_dict.update({u'houseID': int(re.findall('[A-Z](\d+)', houseID.strip())[0])})
+                        else:
+                            info_dict.update({u'houseID': int(houseID.strip())})
 
-                    unitPrice = name.find("div", {"class": "unitPrice"})
-                    if unitPrice.span is None:
+                        house = housetitle.get_text().strip().split(' ')
+                        info_dict.update({u'community': communityname})
                         info_dict.update(
-                            {u'unitPrice': 0})
-                    else:
+                            {u'housetype': house[1].strip() if 1 < len(house) else 0})
                         info_dict.update(
-                            {u'unitPrice': unitPrice.span.get_text().strip()})
+                            {u'square': float(re.findall('(\d+)[\u4e00-\u9fa5]+',house[2].strip())[0]) if 2 < len(house) else 0})
 
-                    dealDate = name.find("div", {"class": "dealDate"})
-                    info_dict.update(
-                        {u'dealdate': dealDate.get_text().strip().replace('.', '-')})
-                    # print(info_dict)
-                    info_dict.update({u'houseState': u'成交'})
-                    # print(info_dict)
+                        houseinfo = name.find("div", {"class": "houseInfo"})
+                        info = houseinfo.get_text().split('|')
+                        info_dict.update({u'direction': info[0].strip()})
+                        info_dict.update(
+                            {u'decoration': info[1].strip() if 1 < len(info) else ''})
+
+                        housefloor = name.find("div", {"class": "positionInfo"})
+                        floor_all = housefloor.get_text().strip().split(' ')
+                        info_dict.update({u'floor': floor_all[0].strip()})
+                        info_dict.update(
+                            {u'years': int(re.findall(r'(\d+)[\u4e00-\u9fa5]+', floor_all[-1].strip())[0])})
+
+                        followInfo1 = name.find("div", {"class": "dealHouseInfo"})
+                        # followInfo = followInfo1.find("span", {"class": "dealHouseTxt"})
+                        if followInfo1 is None:
+                            info_dict.update(
+                                {u'tag': ''})
+                        else:
+                            followInfo = followInfo1.find("span", {"class": "dealHouseTxt"})
+                            info_dict.update(
+                                {u'tag': followInfo.span.get_text().strip()})
+
+                        totalPrice = name.find("div", {"class": "totalPrice"})
+                        # print(totalPrice.span.get_text.strip())
+                        if totalPrice.span is None:
+                            info_dict.update(
+                                {u'totalPrice': 0})
+
+                        else:
+                            if len(list(re.findall('\d[*]+', totalPrice.span.get_text().strip()))) > 0:
+                                url = info_dict['link']
+                                source_code = misc.get_source_code(url)
+                                soup1 = BeautifulSoup(source_code, 'lxml')
+                                price = soup1.find('div', {'class': 'price'})
+                                totalPrice_in = price.span.i.get_text().strip()
+                                unitPrice_in = price.b.get_text().strip()
+
+                                dealDate_in1 = soup1.findAll('div', {"class": "chengjiao_record"})[0]
+                                dealDate_in2 = dealDate_in1.ul.li.p.get_text()
+                                dealDate_in3 = re.findall('.*?,(\d+-\d+-\d+)[\u4e00-\u9fa5]', dealDate_in2)[0]
+
+                                info_dict.update({u'totalPrice': float(totalPrice_in)})
+                            else:
+                                info_dict.update(
+                                    {u'totalPrice': totalPrice.span.get_text().strip()})
+
+                        unitPrice = name.find("div", {"class": "unitPrice"})
+                        if unitPrice.span is None:
+                            info_dict.update(
+                                {u'unitPrice': 0})
+                        else:
+                            if unitPrice.span.get_text().strip() == '下载APP查看成交>':
+                                info_dict.update({u'unitPrice': float(unitPrice_in)})
+                            else:
+                                info_dict.update(
+                                    {u'unitPrice': float(unitPrice.span.get_text().strip())})
+
+                        dealDate = name.find("div", {"class": "dealDate"})
+                        if dealDate.get_text().strip() == '近30天内成交':
+                            info_dict.update(
+                                {u'updatedate': dealDate_in3})
+                        else:
+                            info_dict.update(
+                                {u'updatedate': dealDate.get_text().strip().replace('.', '-')})
+                        info_dict.update({u'houseState': u'成交'})
+                        # print(info_dict)
+                        # print(len(info_dict))
+                        # print(type(info_dict['updateDate']))
                 except:
                     continue
                 # Sellinfo insert into mysql
                 data_source.append(info_dict)
+                # print(len(data_source))
                 # model.Sellinfo.insert(**info_dict).upsert().execute()
         for data in data_source:
             try:

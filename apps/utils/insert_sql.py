@@ -14,10 +14,12 @@ def insertCommunity(dicts):
 
 def insertHouseinfo(dicts):
     from house import models
-
-    community = models.Community.objects.get(title=dicts['community'])
-    print(dicts['community'])
-    dict['community'] = community
+    try:
+        community = models.Community.objects.get(title=dicts['community'])
+    # print(dicts['community'])
+        dicts['community'] = community
+    except:
+        pass
     models.Houseinfo.objects.create(**dicts)
 
 
