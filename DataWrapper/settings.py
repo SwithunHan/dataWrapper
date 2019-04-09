@@ -117,12 +117,14 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
 CITY = 'bj'  # only one, shanghai=sh shenzhen=sh......
-REGIONLIST = [u'dongcheng',u'xicheng',u'chaoyang',u'haidian',u'fengtai',u'shijingshan',u'changping',u'daxing',u'yizhuangkaifaqu',u'shunyi',u'fangshan'
-    ,u'mentougou',u'pinggu',u'huairou',u'tongzhou',u'miyun',u'yanqing',u'yanjiao',u'xianghe',u'guangyang',u'anci',u'langfangjingjijishu',u'guan']  # only pinyin support
+REGIONLIST = [u'dongcheng', u'xicheng', u'chaoyang', u'haidian', u'fengtai', u'shijingshan', u'changping', u'daxing',
+              u'yizhuangkaifaqu', u'shunyi', u'fangshan'
+    , u'mentougou', u'pinggu', u'huairou', u'tongzhou', u'miyun', u'yanqing', u'yanjiao', u'xianghe', u'guangyang',
+              u'anci', u'langfangjingjijishu', u'guan']  # only pinyin support

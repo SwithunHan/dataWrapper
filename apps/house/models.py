@@ -45,7 +45,7 @@ class Houseinfo(models.Model):
     square = models.FloatField(default=0, max_length=50, verbose_name="房屋面积")
     direction = models.CharField(default=0, max_length=50, verbose_name="朝向")
     floor = models.CharField(default=0, max_length=50, verbose_name="楼层")
-    taxtype = models.CharField(default=0, max_length=50, verbose_name="标签")
+    tag = models.CharField(default=0, max_length=50, verbose_name="标签")
     totalPrice = models.FloatField(default=0, verbose_name="总价")
     unitPrice = models.FloatField(default=0, verbose_name="每平米价格")
     followInfo = models.CharField(default=0, max_length=50, verbose_name="关注数")
@@ -55,7 +55,7 @@ class Houseinfo(models.Model):
     validdate = models.DateTimeField(default=datetime.now, verbose_name='插入数据时间')
 
     class Meta:
-        verbose_name = "房源信息"
+        verbose_name = "在售房源信息"
         verbose_name_plural = verbose_name
 
 
@@ -85,18 +85,18 @@ class Rentinfo(models.Model):
     """
     租房信息
     """
-    houseID = models.BigIntegerField(default=0, primary_key=True, verbose_name="房子id")
-    title = models.CharField(default=0, max_length=50, verbose_name="房子名称")
-    link = models.CharField(default=0, max_length=255, verbose_name="房子链接")
-    decoration = models.CharField(default=0, max_length=50, verbose_name="装饰类型")
-    region = models.CharField(default=0, max_length=50, verbose_name="区域")
-    zone = models.CharField(default=0, max_length=50, verbose_name="商圈")
-    meters = models.FloatField(default=0, verbose_name="平米数")
-    other = models.CharField(default=0, max_length=50, verbose_name="其他信息")
-    subway = models.CharField(default=0, max_length=50, verbose_name="地铁站")
-    heating = models.CharField(default=0, max_length=50, verbose_name="供暖")
-    price = models.FloatField(default=0, max_length=50, verbose_name="单价")
-    housetype = models.CharField(default=0, max_length=50, verbose_name="户型")
+    houseID = models.BigIntegerField(primary_key=True, verbose_name="房子id")
+    title = models.CharField(max_length=50, verbose_name="房子名称")
+    link = models.CharField(max_length=50, verbose_name="房子链接")
+    decoration = models.CharField(max_length=50, verbose_name="装饰类型")
+    region = models.CharField(max_length=50, verbose_name="区域")
+    zone = models.CharField(max_length=50, verbose_name="商圈")
+    meters = models.FloatField(verbose_name="平米数")
+    other = models.CharField(max_length=50, verbose_name="其他信息")
+    subway = models.CharField(max_length=50, verbose_name="地铁站")
+    heating = models.CharField(max_length=50, verbose_name="供暖")
+    price = models.FloatField(max_length=50, verbose_name="单价")
+    housetype = models.CharField(max_length=50, verbose_name="户型")
     updatedate = models.DateTimeField(default=datetime.now)
 
     class Meta:
@@ -108,5 +108,5 @@ class Hisprice(models.Model):
     """
     房屋总价
     """
-    houseID = models.BigIntegerField(default=0, primary_key=True, verbose_name="房子id")
-    totalPrice = models.FloatField(default=0, verbose_name="总价")
+    houseID = models.BigIntegerField(primary_key=True, verbose_name="房子id")
+    totalPrice = models.FloatField(verbose_name="总价")
