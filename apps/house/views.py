@@ -1,10 +1,18 @@
 from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import viewsets, mixins
 from .models import Houseinfo, Community
 from .serializers import HouseinfoSerializer, CommunitySerializer, DistrictSerializer
 from rest_framework import filters
+
+
+class HousePagination(PageNumberPagination):
+    page_size = 100
+    page_size_query_param = 'page_size'
+    page_query_param = "page"
+    max_page_size = 100
 
 
 # Create your views here.
@@ -13,24 +21,15 @@ class CommunityViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     serializer_class = CommunitySerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
     search_fields = ("title",)
+    pagination_class = HousePagination
 
 
 class HouseViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Houseinfo.objects.all()[:100]
+    queryset = Houseinfo.objects.extra(select={'key': 'houseID'}).all()
     serializer_class = HouseinfoSerializer
     filter_backends = (DjangoFilterBackend, filters.SearchFilter)
-    search_fields = ("community",)
-
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
-        print(request)
-        page = self.paginate_queryset(queryset)
-        if page is not None:
-            serializer = self.get_serializer(page, many=True)
-            return self.get_paginated_response(serializer.data)
-
-        serializer = self.get_serializer(queryset, many=True)
-        return Response(serializer.data)
+    search_fields = ('community',)
+    pagination_class = HousePagination
 
 
 class DistributionViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):

@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.db.models import Q
 
 from .models import Houseinfo, Hisprice, Community, Rentinfo
 
@@ -22,14 +21,8 @@ class RentinfoSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class CommunityTitleSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Community
-        fields = ("title",)
-
-
 class HouseinfoSerializer(serializers.ModelSerializer):
-    community = CommunityTitleSerializer()
+    key = serializers.IntegerField()
 
     class Meta:
         model = Houseinfo

@@ -22,7 +22,7 @@ from house.views import HouseViewSet, CommunityViewSet, DistributionViewSet
 routers = DefaultRouter()
 routers.register(r'houselist', HouseViewSet, base_name="houselist")
 routers.register(r'community', CommunityViewSet, base_name="community")
-routers.register(r'distribution', DistributionViewSet, base_name="community")
+routers.register(r'distribution', DistributionViewSet, base_name="distribution")
 
 urlpatterns = [
     # xadmin url
