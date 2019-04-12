@@ -1,15 +1,18 @@
 from django_filters import rest_framework as filters
-from .models import Community
+from .models import Houseinfo, Community
 from django.db.models import Q
 
 
-class GoodsFilter(filters.FilterSet):
+class HouseFilter(filters.FilterSet):
     title = filters.CharFilter(field_name="title", lookup_expr='icontains')
 
-    @staticmethod
-    def top_category_filter(queryset, name, value):
-        return queryset.filter(Q(category_id=value) | Q(category__parent_category_id=value) | Q(
-            category__parent_category__parent_category_id=value))
+    class Meta:
+        model = Houseinfo
+        fields = ['community']
+
+
+class CommunityFilter(filters.FilterSet):
+    title = filters.CharFilter(field_name="title", lookup_expr='icontains')
 
     class Meta:
         model = Community

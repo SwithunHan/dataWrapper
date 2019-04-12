@@ -31,8 +31,8 @@ class Community(models.Model):
         verbose_name = "小区"
         verbose_name_plural = verbose_name
 
-    def __str__(self):
-        return self.title
+    # def __str__(self):
+    #     return self.title
 
 
 class Houseinfo(models.Model):
