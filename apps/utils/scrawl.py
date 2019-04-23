@@ -7,8 +7,9 @@ django.setup()
 from utils import core
 from house import models
 
-from DataWrapper.settings import  CITY
+from DataWrapper.settings import CITY
 import pandas as pd
+
 
 def get_communitylist(city):
     res = []
@@ -16,13 +17,18 @@ def get_communitylist(city):
         if community.city == city:
             res.append(community.title)
     return res
+
+
 list1 = []
+
+
 def open_csv():
     source_data = pd.read_csv('testcsv.csv')
     list = source_data.values.tolist()
     for i in range(0, len(list)):
         list1.append(list[i][1])
     return list1
+
 
 if __name__ == "__main__":
     regionlist = open_csv()  # only pinyin support
