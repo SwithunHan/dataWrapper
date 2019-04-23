@@ -62,3 +62,10 @@ class UserRegSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ('username', 'password')
+
+
+class HousePriceAreaSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Houseinfo
+        fields = "__all__"

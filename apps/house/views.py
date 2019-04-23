@@ -12,7 +12,7 @@ from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handl
 
 from .filters import HouseFilter, CommunityFilter
 from .models import Houseinfo, Community
-from .serializers import HouseinfoSerializer, CommunitySerializer, DistrictSerializer, UserRegSerializer
+from .serializers import HouseinfoSerializer, CommunitySerializer, DistrictSerializer, UserRegSerializer,HousePriceAreaSerializer
 
 from rest_framework import filters
 
@@ -76,3 +76,9 @@ class UserViewset(CreateModelMixin, viewsets.GenericViewSet):
 
     def perform_create(self, serializer):
         return serializer.save()
+
+
+class HousePriceAreaViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Houseinfo.objects.all()
+    serializer_class = HousePriceAreaSerializer
+    pagination_class = HousePagination
