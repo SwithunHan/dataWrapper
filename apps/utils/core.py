@@ -21,7 +21,7 @@ logging.basicConfig(
 
 
 # 根据行政区获取小区列表函数打印日志
-def GetCommunityByRegionlist(city, regionlist=[u'xicheng']):
+def GetCommunityByRegionlist(city, regionlist):
     logging.info("Get Community Infomation")
     starttime = datetime.datetime.now()
     for regionname in regionlist:
@@ -37,9 +37,9 @@ def GetCommunityByRegionlist(city, regionlist=[u'xicheng']):
 
 
 # 获取小区列表
-def get_community_perregion(city, regionname=u'xicheng'):
+def get_community_perregion(city, regionname):
     baseUrl = u"http://%s.lianjia.com/" % (city)
-    url = baseUrl + u"xiaoqu/" + regionname + "/"
+    url = baseUrl + u"xiaoqu/" + 'rs'+regionname + "/"
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
 
@@ -51,80 +51,96 @@ def get_community_perregion(city, regionname=u'xicheng'):
         row = models.Community.select().count()
         raise RuntimeError("Finish at %s because total_pages is None" % row)
 
-    for page in range(total_pages):
+    for page in range(1,total_pages+1):
         if page > 0:
-            url_page = baseUrl + u"xiaoqu/" + regionname + "/pg%d/" % page
+            url_page = baseUrl + u"xiaoqu/" + "pg%d" % page + "rs" + regionname + '/'
             source_code = misc.get_source_code(url_page)
             soup = BeautifulSoup(source_code, 'lxml')
 
-        nameList = soup.findAll("li", {"class": "clear"})
-        i = 0
-        log_progress("GetCommunityByRegionlist",
-                     regionname, page + 1, total_pages)
-        data_source = []
-        for name in nameList:  # Per house loop
-            i = i + 1
-            info_dict = {}
-            try:
-                communitytitle = name.find("div", {"class": "title"})
-                title = communitytitle.get_text().strip('\n')
-                link = communitytitle.a.get('href')
-                info_dict.update({u'title': title})
-                info_dict.update({u'link': link})
+            nameList = soup.findAll("li", {"class": "clear"})
+            i = 0
+            log_progress("GetCommunityByRegionlist",
+                         regionname, page, total_pages)
+            data_source = []
+            for name in nameList:  # Per house loop
+                i = i + 1
+                info_dict = {}
+                try:
+                    communitytitle = name.find("div", {"class": "title"})
+                    title = communitytitle.get_text().strip('\n')
+                    link = communitytitle.a.get('href')
+                    info_dict.update({u'title': title})
+                    info_dict.update({u'link': link})
 
-                district = name.find("a", {"class": "district"})
-                info_dict.update({u'district': district.get_text()})
+                    district = name.find("a", {"class": "district"})
+                    info_dict.update({u'district': district.get_text()})
 
-                bizcircle = name.find("a", {"class": "bizcircle"})
-                info_dict.update({u'bizcircle': bizcircle.get_text()})
+                    bizcircle = name.find("a", {"class": "bizcircle"})
+                    info_dict.update({u'bizcircle': bizcircle.get_text()})
 
-                tagList = name.find("div", {"class": "tagList"})
-                info_dict.update({u'tagList': tagList.get_text().strip('\n')})
-
-                onsale = name.find("a", {"class": "totalSellCount"})
-                info_dict.update(
-                    {u'onsale': int(onsale.span.get_text().strip('\n'))})
-
-                onrent = name.find("a", {"title": title + u"租房"})
-                info_dict.update(
-                    {u'onrent': int(onrent.get_text().strip('\n').split(u'套')[0])})
-
-                info_dict.update({u'id': int(name.get('data-housecode'))})
-
-                price = name.find("div", {"class": "totalPrice"})
-                info_dict.update({u'price': int(price.span.get_text().strip('\n'))})
-
-                communityinfo = get_communityinfo_by_url(link)
-                for key, value in communityinfo.items():
-                    if key == "year":
-                        info_dict.update({key: int(re.findall('(\d+)', value)[0])})
-
-                    elif key == 'building_num':
-                        info_dict.update({key: int(re.findall('(\d+)', value)[0])})
-
-                    elif key == 'house_num':
-                        info_dict.update({key: int(re.findall('(\d+)', value)[0])})
+                    tagList = name.find("div", {"class": "tagList"})
+                    if tagList.get_text()=='\n':
+                        info_dict.update({u'taglist': ''})
+                        info_dict.update({u'subStation': ''})
                     else:
-                        info_dict.update({key: value})
+                        info_dict.update({u'tagList': re.findall('近地铁+(.*?线)([\u4e00-\u9fa5]+)',
+                                                                 tagList.get_text().strip('\n'))[0][0]})
 
-                info_dict.update({u'city': city})
-                # print(info_dict)
-            except:
-                continue
-            # communityinfo insert into mysql
-            data_source.append(info_dict)
-            # print(data_source)
-            # community(info_dict)
-            # models.Community.insert(**info_dict)
+                        subStation = \
+                            re.findall('近地铁+(.*?线)([\u4e00-\u9fa5]+)', tagList.get_text().strip('\n'))[0][
+                            1]
+                        info_dict.update({u'subStation': subStation})
+
+                    # tagList = name.find("div", {"class": "tagList"})
+                    # info_dict.update({u'tagList':tagList.get_text().strip('\n')})
+
+                    onsale = name.find("a", {"class": "totalSellCount"})
+                    info_dict.update(
+                        {u'onsale': int(onsale.span.get_text().strip('\n'))})
+
+                    web_sign = name.find("a", {"title": title + u"网签"})
+                    info_dict.update(
+                        {u'web_sign': int(re.findall('30天成交(\d+)套',web_sign.get_text().strip('\n'))[0])})
+
+                    onrent = name.find("a", {"title": title + u"租房"})
+                    info_dict.update(
+                        {u'onrent': int(onrent.get_text().strip('\n').split(u'套')[0])})
+
+                    info_dict.update({u'id': int(name.get('data-housecode'))})
+
+                    price = name.find("div", {"class": "totalPrice"})
+                    info_dict.update({u'price': int(price.span.get_text().strip('\n'))})
+
+                    communityinfo,img_link= get_communityinfo_by_url(link)
+                    # print(img_link)
+
+                    info_dict.update({u'img_link': img_link})
+
+                    for key, value in communityinfo.items():
+                        if key == "year":
+                            info_dict.update({key: int(re.findall('(\d+)', value)[0])})
+
+                        elif key == 'building_num':
+                            info_dict.update({key: int(re.findall('(\d+)', value)[0])})
+
+                        elif key == 'house_num':
+                            info_dict.update({key: int(re.findall('(\d+)', value)[0])})
+                        else:
+                            info_dict.update({key: value})
+
+                    info_dict.update({u'city': city})
+                    print(info_dict)
+                    # print(len(info_dict))
+                except:
+                    continue
+                # communityinfo insert into mysql
+                data_source.append(info_dict)
         for data in data_source:
             try:
                 insertCommunity(data)
             except:
                 continue
-
-        # with models.database.atomic():
-        #     if data_source:
-        #         models.Community.insert_many(data_source).upsert().execute()
+        print(len(data_source))
         time.sleep(1)
 
 
@@ -135,6 +151,13 @@ def get_communityinfo_by_url(url):
 
     if check_block(soup):
         return
+
+    img = soup.find('div', {'class': 'imgThumbnailList'}).ol.li
+    if img == None:
+        img_link = 'https://s1.ljcdn.com/feroot/pc/asset/img/blank.gif?_v=20190409122206'
+    else:
+        img_link = re.sub('\d+x\d+.jpg', '710x400.jpg',
+                          soup.find('div', {'class': 'imgThumbnailList'}).ol.li.img.get('src'))
 
     communityinfos = soup.findAll("div", {"class": "xiaoquInfoItem"})
     res = {}
@@ -157,7 +180,7 @@ def get_communityinfo_by_url(url):
 
         except:
             continue
-    return res
+    return res,img_link
 
 
 # 根据小区爬取在售房源信息
@@ -231,7 +254,7 @@ def get_house_percommunity(city, communityname):
                     {u'years': int(re.findall(r'.*?/(\d+)[\u4e00-\u9fa5]+/.*?', floor_all[-1].strip())[0])})
 
                 followInfo = name.find("div", {"class": "followInfo"})
-                info_dict.update({u'followInfo': followInfo.get_text()})
+                info_dict.update({u'followInfo': int(re.findall('(\d+)人关注', followInfo.get_text())[0])})
 
                 tax = name.find("div", {"class": "tag"})
                 info_dict.update({u'tag': tax.get_text().strip()})
@@ -340,7 +363,8 @@ def get_sell_percommunity(city, communityname):
                         info_dict.update(
                             {u'housetype': house[1].strip() if 1 < len(house) else 0})
                         info_dict.update(
-                            {u'square': float(re.findall('(\d+)[\u4e00-\u9fa5]+',house[2].strip())[0]) if 2 < len(house) else 0})
+                            {u'square': float(re.findall('(.*?)[\u4e00-\u9fa5]+', house[2].strip())[0]) if 2 < len(
+                                house) else 0})
 
                         houseinfo = name.find("div", {"class": "houseInfo"})
                         info = houseinfo.get_text().split('|')

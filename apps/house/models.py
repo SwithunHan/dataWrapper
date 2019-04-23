@@ -10,9 +10,12 @@ class Community(models.Model):
     id = models.BigIntegerField(default=0, unique=True, verbose_name="小区id")
     title = models.CharField(default=0, primary_key=True, max_length=50, verbose_name="小区名称")
     link = models.CharField(default=0, max_length=255, unique=True, verbose_name="链接地址")
+    img_link = models.CharField(default=0,max_length=255,unique=True,verbose_name='图片链接')
     district = models.CharField(default=0, max_length=50, verbose_name="区域")
     bizcircle = models.CharField(default=0, max_length=50, verbose_name="商圈")
-    tagList = models.CharField(default=0, max_length=50, verbose_name="地铁站")
+    tagList = models.CharField(default=0, max_length=50, verbose_name="地铁线路")
+    subStation = models.CharField(default=0,max_length=50,verbose_name="地铁站")
+    web_sign = models.IntegerField(default=0,verbose_name="网签数量")
     onsale = models.IntegerField(default=0, verbose_name="在售房屋数量")
     onrent = models.IntegerField(default=0, null=True, verbose_name="在租房屋数量")
     year = models.IntegerField(default=0, null=True, verbose_name="建造年份")
@@ -24,7 +27,6 @@ class Community(models.Model):
     house_num = models.IntegerField(default=0, null=True, verbose_name="房屋总数")
     price = models.FloatField(default=0, null=True, verbose_name="平均价格")
     city = models.CharField(default=0, max_length=50, null=True, verbose_name="城市")
-
     validdate = models.DateTimeField(default=datetime.now, verbose_name="添加时间")
 
     class Meta:
@@ -56,6 +58,7 @@ class Houseinfo(models.Model):
     houseState = models.CharField(max_length=50, verbose_name='房源状态', default='在售')
     updatedate = models.DateTimeField(default=datetime.now, verbose_name='成交时间')
     validdate = models.DateTimeField(default=datetime.now, verbose_name='插入数据时间')
+
 
     class Meta:
         verbose_name = "在售房源信息"
@@ -113,3 +116,4 @@ class Hisprice(models.Model):
     """
     houseID = models.BigIntegerField(primary_key=True, verbose_name="房子id")
     totalPrice = models.FloatField(verbose_name="总价")
+    houseAD = models.CharField(default='',max_length=10)
