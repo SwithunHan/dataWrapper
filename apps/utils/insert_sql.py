@@ -16,7 +16,7 @@ def insertHouseinfo(dicts):
     from house import models
     try:
         community = models.Community.objects.get(title=dicts['community'])
-    # print(dicts['community'])
+        # print(dicts['community'])
         dicts['community'] = community
     except:
         pass

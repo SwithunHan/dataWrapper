@@ -51,6 +51,11 @@ dict5 = {'title': '万国城MOMA 3室2厅 3000万', 'link': 'https://bj.lianjia.
          'tag': 'VR房源房本满两年', 'totalPrice': 3000.0, 'unitPrice': 106402.0, 'houseID': 1011073597424}
 dict6 = {'houseID': 101103597424, 'totalPrice': 3000.0}
 
+dict7 = {'title': '国瑞城中区', 'link': 'https://bj.lianjia.com/xiaoqu/1111027374691/', 'district': '东城', 'bizcircle': '崇文门',
+         'tagList': '近地铁5号线', 'subStation': '崇文门站', 'onsale': 29, 'onrent': 12, 'id': 1111027374691, 'price': 95670,
+         'year': 2004, 'housetype': '板楼/塔板结合', 'cost': '1.1至3.1元/平米/月', 'service': '北京国瑞物业管理有限公司',
+         'company': '北京国瑞兴业地产有限公司', 'building_num': 14, 'house_num': 3402, 'city': 'bj'}
+
 
 def main(dict):
     from house import models
@@ -61,7 +66,8 @@ def main(dict):
     # print(1)
     # models.Community.objects.create(**dict)
     # print(2)
-    models.Hisprice.objects.create(**dict)
+    # models.Hisprice.objects.create(**dict)
+    models.Community.objects.create(**dict)
 
 
 import datetime as time
@@ -81,7 +87,7 @@ def test_time():
     print(type(date))
 
 
-main(dict6)
+main(dict7)
 # print(a)
 # test_time()
 print("Done....")
