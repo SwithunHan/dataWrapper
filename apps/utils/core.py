@@ -39,7 +39,7 @@ def GetCommunityByRegionlist(city, regionlist):
 # 获取小区列表
 def get_community_perregion(city, regionname):
     baseUrl = u"http://%s.lianjia.com/" % (city)
-    url = baseUrl + u"xiaoqu/" + 'rs'+regionname + "/"
+    url = baseUrl + u"xiaoqu/" + 'rs' + regionname + "/"
     source_code = misc.get_source_code(url)
     soup = BeautifulSoup(source_code, 'lxml')
 
@@ -51,7 +51,7 @@ def get_community_perregion(city, regionname):
         row = models.Community.select().count()
         raise RuntimeError("Finish at %s because total_pages is None" % row)
 
-    for page in range(1,total_pages+1):
+    for page in range(1, total_pages + 1):
         if page > 0:
             url_page = baseUrl + u"xiaoqu/" + "pg%d" % page + "rs" + regionname + '/'
             source_code = misc.get_source_code(url_page)
@@ -79,8 +79,8 @@ def get_community_perregion(city, regionname):
                     info_dict.update({u'bizcircle': bizcircle.get_text()})
 
                     tagList = name.find("div", {"class": "tagList"})
-                    if tagList.get_text()=='\n':
-                        info_dict.update({u'taglist': ''})
+                    if tagList.get_text() == '\n':
+                        info_dict.update({u'tagList': ''})
                         info_dict.update({u'subStation': ''})
                     else:
                         info_dict.update({u'tagList': re.findall('近地铁+(.*?线)([\u4e00-\u9fa5]+)',
@@ -88,7 +88,7 @@ def get_community_perregion(city, regionname):
 
                         subStation = \
                             re.findall('近地铁+(.*?线)([\u4e00-\u9fa5]+)', tagList.get_text().strip('\n'))[0][
-                            1]
+                                1]
                         info_dict.update({u'subStation': subStation})
 
                     # tagList = name.find("div", {"class": "tagList"})
@@ -100,7 +100,7 @@ def get_community_perregion(city, regionname):
 
                     web_sign = name.find("a", {"title": title + u"网签"})
                     info_dict.update(
-                        {u'web_sign': int(re.findall('30天成交(\d+)套',web_sign.get_text().strip('\n'))[0])})
+                        {u'web_sign': int(re.findall('30天成交(\d+)套', web_sign.get_text().strip('\n'))[0])})
 
                     onrent = name.find("a", {"title": title + u"租房"})
                     info_dict.update(
@@ -111,7 +111,7 @@ def get_community_perregion(city, regionname):
                     price = name.find("div", {"class": "totalPrice"})
                     info_dict.update({u'price': int(price.span.get_text().strip('\n'))})
 
-                    communityinfo,img_link= get_communityinfo_by_url(link)
+                    communityinfo, img_link = get_communityinfo_by_url(link)
                     # print(img_link)
 
                     info_dict.update({u'img_link': img_link})
@@ -180,7 +180,7 @@ def get_communityinfo_by_url(url):
 
         except:
             continue
-    return res,img_link
+    return res, img_link
 
 
 # 根据小区爬取在售房源信息
@@ -288,15 +288,6 @@ def get_house_percommunity(city, communityname):
             except:
                 continue
 
-        # models.Hisprice.insert(houseID=info_dict['houseID'], totalPrice=info_dict['totalPrice']).upsert(
-        # ).execute()
-
-        # with models.database.atomic():
-        #     if data_source:
-        #         models.Houseinfo.insert_many(data_source).upsert().execute()
-        #     if hisprice_data_source:
-        #         models.Hisprice.insert_many(
-        #             hisprice_data_source).upsert().execute()
         time.sleep(1)
 
 
