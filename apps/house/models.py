@@ -10,7 +10,7 @@ class Community(models.Model):
     id = models.BigIntegerField(default=0, unique=True, verbose_name="小区id")
     title = models.CharField(default=0, primary_key=True, max_length=50, verbose_name="小区名称")
     link = models.CharField(default=0, max_length=255, unique=True, verbose_name="链接地址")
-    img_link = models.CharField(default=0,max_length=255,unique=True,verbose_name='图片链接')
+    img_link = models.CharField(default=0,max_length=255,verbose_name='图片链接')
     district = models.CharField(default=0, max_length=50, verbose_name="区域")
     bizcircle = models.CharField(default=0, max_length=50, verbose_name="商圈")
     tagList = models.CharField(default=0, max_length=50, verbose_name="地铁线路")

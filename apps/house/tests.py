@@ -55,6 +55,12 @@ dict7 = {'title': '国瑞城中区', 'link': 'https://bj.lianjia.com/xiaoqu/1111
          'tagList': '近地铁5号线', 'subStation': '崇文门站', 'onsale': 29, 'onrent': 12, 'id': 1111027374691, 'price': 95670,
          'year': 2004, 'housetype': '板楼/塔板结合', 'cost': '1.1至3.1元/平米/月', 'service': '北京国瑞物业管理有限公司',
          'company': '北京国瑞兴业地产有限公司', 'building_num': 14, 'house_num': 3402, 'city': 'bj'}
+dict8 = {'title': '首城汇景湾', 'link': 'https://bj.lianjia.com/xiaoqu/1111063599263/', 'district': '平谷',
+         'bizcircle': '平谷其它', 'tagList': '', 'subStation': '', 'onsale': 37, 'web_sign': 1, 'onrent': 1,
+         'id': 1111063599263, 'price': 23758,
+         'img_link': 'https://image1.ljcdn.com/hdic-resblock/fc85e15e-0e59-4c44-9fc8-3a71cafac33f.jpg.710x400.jpg', 'year': 2014,
+         'housetype': '板楼', 'cost': '2.46至3.46元/平米/月', 'service': '北京城承物业管理有限责任公司', 'company': '北京首城置业有限公司',
+         'building_num': 34, 'house_num': 2651, 'city': 'bj'}
 
 
 def main(dict):
@@ -70,6 +76,7 @@ def main(dict):
     models.Community.objects.create(**dict)
 
 
+main(dict8)
 import datetime as time
 
 
@@ -87,7 +94,7 @@ def test_time():
     print(type(date))
 
 
-main(dict7)
+# main(dict7)
 # print(a)
 # test_time()
 print("Done....")
