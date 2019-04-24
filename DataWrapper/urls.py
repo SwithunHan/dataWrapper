@@ -17,12 +17,16 @@ from django.contrib import admin
 from django.conf.urls import url, include
 from rest_framework.routers import DefaultRouter
 from rest_framework.documentation import include_docs_urls
-from house.views import HouseViewSet,CommunityViewSet
+from rest_framework_jwt.views import obtain_jwt_token
+
+from house.views import HouseViewSet, CommunityViewSet, DistributionViewSet, UserViewset,HousePriceAreaViewSet
 
 routers = DefaultRouter()
-routers.register(r'houselist', HouseViewSet, base_name="houselist")
-routers.register(r'community', CommunityViewSet, base_name="community")
-
+routers.register(r'api/houselist', HouseViewSet, base_name="houselist")
+routers.register(r'api/community', CommunityViewSet, base_name="community")
+routers.register(r'api/distribution', DistributionViewSet, base_name="distribution")
+routers.register(r'api/registered', UserViewset, base_name="users")
+routers.register(r'api/housepricearea', HousePriceAreaViewSet, base_name="housepricearea")
 urlpatterns = [
     # xadmin url
     url(r'^admin/', admin.site.urls),
@@ -32,4 +36,6 @@ urlpatterns = [
     url(r'^docs/', include_docs_urls(title="项目文档")),
     # api登录
     url(r'^api-auth/', include('rest_framework.urls')),
+    # 登陆
+    url(r'^api/login/', obtain_jwt_token)
 ]

@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.1/ref/settings/
 """
-
+import datetime
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'house.apps.HouseConfig',
     'django_filters',
+    'rest_framework.authtoken',
 ]
 
 MIDDLEWARE = [
@@ -82,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': "datawrapper",
         'USER': "root",
-        'PASSWORD': '1111',
+        'PASSWORD': '2320720405',
         'HOST': "127.0.0.1",
         'OPTIONS': {'init_command': "SET default_storage_engine=INNODB;"}
     }
@@ -123,9 +124,25 @@ USE_TZ = False
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
 
 STATIC_URL = '/static/'
-CITY = 'bj'
-# REGIONLIST = [u'dongcheng', u'xicheng', u'chaoyang', u'haidian', u'fengtai', u'shijingshan', u'changping', u'daxing',
-#               u'yizhuangkaifaqu', u'shunyi', u'fangshan'
-#     , u'mentougou', u'pinggu', u'huairou', u'tongzhou', u'miyun', u'yanqing', u'yanjiao', u'xianghe', u'guangyang',
-#               u'anci', u'langfangjingjijishu', u'guan']  # only pinyin support
-REGIONLIST = u'dongcheng'
+CITY = 'bj'  # only one, shanghai=sh shenzhen=sh......
+REGIONLIST = [u'dongcheng', u'xicheng', u'chaoyang', u'haidian', u'fengtai', u'shijingshan', u'changping', u'daxing',
+              u'yizhuangkaifaqu', u'shunyi', u'fangshan'
+    , u'mentougou', u'pinggu', u'huairou', u'tongzhou', u'miyun', u'yanqing', u'yanjiao', u'xianghe', u'guangyang',
+              u'anci', u'langfangjingjijishu', u'guan']  # only pinyin support
+REST_FRAMEWORK = {
+    # 分页显示
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    # 'PAGE_SIZE': 10,
+    # 配置过滤
+    'DEFAULT_FILTER_BACKENDS': ('django_filters.rest_framework.DjangoFilterBackend',),
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework.authentication.BasicAuthentication',
+    #     'rest_framework.authentication.SessionAuthentication',
+    #     'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    # )
+}
+# 设置token过期时间
+JWT_AUTH = {
+    'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7),  # 也可以设置seconds=20
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',  # JWT跟前端保持一致，比如“token”这里设置成JWT
+}
