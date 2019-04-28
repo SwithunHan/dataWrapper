@@ -92,3 +92,12 @@ class HouseTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Houseinfo
         fields = ("name", "value")
+
+
+class HouseNumberSerializer(serializers.ModelSerializer):
+    value = serializers.IntegerField()
+    name = serializers.CharField(source='community__district')
+
+    class Meta:
+        model = Houseinfo
+        fields = ("name", "value")

@@ -9,10 +9,10 @@ from rest_framework.response import Response
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
-from .filters import HouseFilter, CommunityFilter, SellFilter, HousetypeFilter
+from .filters import HouseFilter, CommunityFilter, SellFilter, HousetypeFilter, HouseStateFilter
 from .models import Houseinfo, Community
 from .serializers import HouseinfoSerializer, CommunitySerializer, DistrictSerializer, UserRegSerializer, \
-    HousePriceAreaSerializer, SellNumberAreaSerializer, HouseTypeSerializer
+    HousePriceAreaSerializer, SellNumberAreaSerializer, HouseTypeSerializer, HouseNumberSerializer
 
 from rest_framework import filters
 
@@ -98,9 +98,19 @@ class SellNumberAreaViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     filter_class = SellFilter
 
 
+# 查找各行政区内各种类型的房屋数量
 class HouseTypeViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Houseinfo.objects.filter().values("housetype").annotate(value=Count("housetype"))
     serializer_class = HouseTypeSerializer
     filter_backends = (DjangoFilterBackend,)
     filter_class = HousetypeFilter
+    pagination_class = HousePagination
+
+
+# 各个行政区内房屋数量
+class HouseNumberViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = Houseinfo.objects.filter().values("community__district").annotate(value=Count("community__district"))
+    serializer_class = HouseNumberSerializer
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = HouseStateFilter
     pagination_class = HousePagination

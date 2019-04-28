@@ -34,3 +34,11 @@ class HousetypeFilter(filters.FilterSet):
     class Meta:
         model = Houseinfo
         fields = ['community__district']
+
+
+class HouseStateFilter(filters.FilterSet):
+    houseState = filters.CharFilter(field_name="houseState")
+
+    class Meta:
+        model = Houseinfo
+        fields = ['houseState']
