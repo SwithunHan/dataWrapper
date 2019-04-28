@@ -24,19 +24,18 @@ class RentinfoSerializer(serializers.ModelSerializer):
 
 
 class HouseinfoSerializer(serializers.ModelSerializer):
-    key = serializers.IntegerField()
-
     class Meta:
         model = Houseinfo
         fields = "__all__"
 
 
 class DistrictSerializer(serializers.ModelSerializer):
-    num = serializers.IntegerField()
+    value = serializers.IntegerField()
+    name = serializers.CharField(source='district')
 
     class Meta:
         model = Community
-        fields = ("district", "num")
+        fields = ("name", "value")
 
 
 class UserRegSerializer(serializers.ModelSerializer):
@@ -65,7 +64,31 @@ class UserRegSerializer(serializers.ModelSerializer):
 
 
 class HousePriceAreaSerializer(serializers.ModelSerializer):
-
     class Meta:
         model = Houseinfo
         fields = "__all__"
+
+
+# 成交数量
+class SellNumberAreaSerializer(serializers.ModelSerializer):
+    # value = serializers.IntegerField()
+    # name = serializers.CharField(source='community_district')
+    #
+    # class Meta:
+    #     model = Houseinfo
+    #     fields = ("name", "value")
+    # community = CommunitySerializer()
+    value = serializers.IntegerField()
+
+    class Meta:
+        model = Houseinfo
+        fields = ("value",)
+
+
+class HouseTypeSerializer(serializers.ModelSerializer):
+    value = serializers.IntegerField()
+    name = serializers.CharField(source='housetype')
+
+    class Meta:
+        model = Houseinfo
+        fields = ("name", "value")
