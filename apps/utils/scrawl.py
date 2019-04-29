@@ -33,11 +33,11 @@ def open_csv():
 if __name__ == "__main__":
     regionlist = open_csv()  # only pinyin support
     city = CITY
-    print(regionlist)
+    # print(regionlist)
     # core.GetHouseByRegionlist(city, regionlist)
     # core.GetRentByRegionlist(city, regionlist)
     # Init,scrapy celllist and insert database; could run only 1st time
-    core.GetCommunityByRegionlist(city, regionlist)
+    # core.GetCommunityByRegionlist(city, regionlist)
     communitylist = get_communitylist(city)  # Read celllist from database
     core.GetHouseByCommunitylist(city, communitylist)
     core.GetSellByCommunitylist(city, communitylist)

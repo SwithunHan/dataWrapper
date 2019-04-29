@@ -36,3 +36,7 @@ def insertRentinfo(dicts):
 def insertHisprice(dicts):
     from house import models
     models.Hisprice.objects.create(**dicts)
+
+def insertDynamic(dicts):
+    from house import models
+    models.Dynamic.objects.create(**dicts)
