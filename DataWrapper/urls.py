@@ -19,7 +19,8 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.documentation import include_docs_urls
 from rest_framework_jwt.views import obtain_jwt_token
 
-from house.views import HouseViewSet, CommunityViewSet, DistributionViewSet, UserViewset,HousePriceAreaViewSet
+from house.views import HouseViewSet, CommunityViewSet, DistributionViewSet, UserViewset, HousePriceAreaViewSet, \
+    SellNumberAreaViewSet, HouseTypeViewSet, HouseNumberViewSet
 
 routers = DefaultRouter()
 routers.register(r'api/houselist', HouseViewSet, base_name="houselist")
@@ -27,6 +28,9 @@ routers.register(r'api/community', CommunityViewSet, base_name="community")
 routers.register(r'api/distribution', DistributionViewSet, base_name="distribution")
 routers.register(r'api/registered', UserViewset, base_name="users")
 routers.register(r'api/housepricearea', HousePriceAreaViewSet, base_name="housepricearea")
+routers.register(r'api/sellnumberarea', SellNumberAreaViewSet, base_name="sellnumberarea")
+routers.register(r'api/housetype', HouseTypeViewSet, base_name="housetype")
+routers.register(r'api/housenumber', HouseNumberViewSet, base_name="housenumber")
 urlpatterns = [
     # xadmin url
     url(r'^admin/', admin.site.urls),
