@@ -117,3 +117,9 @@ class Hisprice(models.Model):
     houseID = models.BigIntegerField(primary_key=True, verbose_name="房子id")
     totalPrice = models.FloatField(verbose_name="总价")
     houseAD = models.CharField(default='',max_length=10)
+
+class Dynamic(models.Model):
+    title = models.CharField(max_length=255,verbose_name='动态标题')
+    url = models.CharField(max_length=255,verbose_name='动态链接')
+    source = models.CharField(max_length=50,verbose_name='动态来源')
+    date_time = models.CharField(max_length=100,verbose_name='动态发布时间')
