@@ -1,5 +1,10 @@
+import datetime
+import json
+import re
+
 from django.contrib.auth import get_user_model
-from django.db.models import Count, Q
+from django.db.models import Count, Q, Max, Min
+from django.http import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.pagination import PageNumberPagination
@@ -9,10 +14,10 @@ from rest_framework.response import Response
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
 from rest_framework_jwt.serializers import jwt_payload_handler, jwt_encode_handler
 
-from .filters import HouseFilter, CommunityFilter, SellFilter, HousetypeFilter, HouseStateFilter
+from .filters import HouseFilter, CommunityFilter, HousetypeFilter, HouseStateFilter
 from .models import Houseinfo, Community
 from .serializers import HouseinfoSerializer, CommunitySerializer, DistrictSerializer, UserRegSerializer, \
-    HousePriceAreaSerializer, SellNumberAreaSerializer, HouseTypeSerializer, HouseNumberSerializer
+    HousePriceAreaSerializer, HouseTypeSerializer, HouseNumberSerializer
 
 from rest_framework import filters
 
@@ -90,12 +95,34 @@ class HousePriceAreaViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
 
 # 行政区房屋成交量(未完成)
-class SellNumberAreaViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Houseinfo.objects.values("housetype").annotate(value=Count("housetype"))
-    serializer_class = SellNumberAreaSerializer
-    filter_backends = (DjangoFilterBackend,)
-    pagination_class = HousePagination
-    filter_class = SellFilter
+def get_years(string):
+    return int(re.findall('(\d{4})', str(string))[0])
+
+
+def sellNumberAreaViewSet(request):
+    max_year = get_years(Houseinfo.objects.aggregate(Max('updatedate'))['updatedate__max'])
+    min_year = get_years(Houseinfo.objects.aggregate(Min('updatedate'))['updatedate__min'])
+    dict_list = []
+    area_list = ['朝阳', '海淀', '东城', '西城', '丰台', '石景山', '通州', '昌平', '大兴', '亦庄开发区', '顺义', '房山', '门头沟', '平谷', '怀柔', '密云',
+                 '延庆']
+    for year in range(min_year, max_year + 1):
+        print(year)
+        dict1 = {'name': year}
+        start_date = datetime.datetime(year, 1, 1, 0, 0, 0)
+        end_date = datetime.datetime(year, 12, 31, 23, 59, 59)
+        for area in area_list:
+            house = Houseinfo.objects.filter(houseState='成交', updatedate__range=(start_date, end_date),
+                                             community__district=area)
+            for item in house:
+                district = item.community.district
+                item.community_id = district
+            house = house.aggregate(Count("community"))['community__count']
+            # if area != '亦庄开发区':
+            #     area = area + "区"
+            dict1[area] = house
+        dict_list.append(dict1)
+
+    return HttpResponse(json.dumps(dict_list))
 
 
 # 查找各行政区内各种类型的房屋数量
