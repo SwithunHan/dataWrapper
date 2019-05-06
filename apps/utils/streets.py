@@ -6,6 +6,9 @@ import time
 import pandas as pd
 from utils.misc import hds
 
+"""
+抓取小区的街道信息
+"""
 
 Community = [u'dongcheng', u'xicheng', u'chaoyang', u'haidian', u'fengtai', u'shijingshan', u'changping', u'daxing',
               u'yizhuangkaifaqu', u'shunyi', u'fangshan'

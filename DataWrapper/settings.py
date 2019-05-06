@@ -84,7 +84,6 @@ DATABASES = {
         'NAME': "datawrapper",
         'USER': "root",
         'PASSWORD': '2320720405',
-        # 'HOST': "127.0.0.1",
         'HOST': "47.106.140.222",
         'OPTIONS': {'init_command': "SET default_storage_engine=INNODB;"}
     }
