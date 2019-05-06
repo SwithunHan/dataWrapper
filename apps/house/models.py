@@ -91,18 +91,18 @@ class Rentinfo(models.Model):
     租房信息
     """
     houseID = models.BigIntegerField(primary_key=True, verbose_name="房子id")
-    title = models.CharField(max_length=50, verbose_name="房子名称")
-    link = models.CharField(max_length=50, verbose_name="房子链接")
-    decoration = models.CharField(max_length=50, verbose_name="装饰类型")
-    region = models.CharField(max_length=50, verbose_name="区域")
-    zone = models.CharField(max_length=50, verbose_name="商圈")
-    meters = models.FloatField(verbose_name="平米数")
-    other = models.CharField(max_length=50, verbose_name="其他信息")
-    subway = models.CharField(max_length=50, verbose_name="地铁站")
-    heating = models.CharField(max_length=50, verbose_name="供暖")
-    price = models.FloatField(max_length=50, verbose_name="单价")
+    title = models.CharField(max_length=255, verbose_name="房子名称")
+    link = models.CharField(max_length=255, verbose_name="房子链接")
+    direction = models.CharField(default=0,max_length=50, verbose_name='房屋朝向')
     housetype = models.CharField(max_length=50, verbose_name="户型")
-    updatedate = models.DateTimeField(default=datetime.now)
+    price = models.FloatField(max_length=50, verbose_name="单价")
+    lable = models.CharField(max_length=50,default=0, verbose_name="标签")
+    meters = models.FloatField(verbose_name="平米数")
+    subway = models.CharField(max_length=255, default=0,verbose_name="地铁站")
+    floor = models.CharField(max_length=50, default=0,verbose_name="楼层")
+    region = models.CharField(max_length=50, default=0,verbose_name="区域")
+    rent_time = models.CharField(max_length=50, default=0,verbose_name="租期")
+    shelf_time = models.DateTimeField(default=0,verbose_name='上架时间')
 
     class Meta:
         verbose_name = "租房信息"
@@ -115,10 +115,32 @@ class Hisprice(models.Model):
     """
     houseID = models.BigIntegerField(primary_key=True, verbose_name="房子id")
     totalPrice = models.FloatField(verbose_name="总价")
-    houseAD = models.CharField(default='', max_length=10)
+    houseAD = models.CharField(default=0, max_length=10)
+
 
 class Dynamic(models.Model):
-    title = models.CharField(max_length=255,verbose_name='动态标题')
-    url = models.CharField(max_length=255,verbose_name='动态链接')
-    source = models.CharField(max_length=50,verbose_name='动态来源')
-    date_time = models.CharField(max_length=100,verbose_name='动态发布时间')
+    """
+    楼市动态
+    """
+    title = models.CharField(max_length=255, verbose_name='动态标题')
+    url = models.CharField(max_length=255, verbose_name='动态链接')
+    source = models.CharField(max_length=50, verbose_name='动态来源')
+    date_time = models.CharField(max_length=100, verbose_name='动态发布时间')
+
+
+class Web_sign_new(models.Model):
+    """
+    网签最新数据
+    """
+    Date = models.DateTimeField(verbose_name='日期')
+    House_num = models.IntegerField(verbose_name='网上签约数量')
+    House_square = models.IntegerField(verbose_name='网上签约面积')
+    Online_num = models.IntegerField(verbose_name='住宅签约数量')
+    Online_square = models.IntegerField(verbose_name='住宅签约面积')
+
+
+class Web_sign_old(models.Model):
+    Date = models.DateTimeField(verbose_name='日期')
+    Online_num = models.IntegerField(verbose_name='住宅签约数量')
+
+
