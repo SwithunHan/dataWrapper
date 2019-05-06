@@ -1,11 +1,12 @@
 """
-获取凤凰网，今日头条关于北京二手房的动态信息
+获取凤凰网，今日头条 关于北京二手房的动态信息
+定时爬取
 """
 
 import requests
 import time
 from lxml import etree
-from .insert_sql import insertDynamic
+# from .insert_sql import insertDynamic
 
 def get_jrtt():
     baseurl = 'https://www.toutiao.com/api/search/content/?'
@@ -64,11 +65,11 @@ def get_jrtt():
         else:
             continue
         data_source.append(info_dict)
-    for data in data_source:
-        try:
-            insertDynamic(data)
-        except:
-            continue
+    # for data in data_source:
+    #     try:
+    #         insertDynamic(data)
+    #     except:
+    #         continue
 
 
 def get_fh():
@@ -111,8 +112,8 @@ def get_fh():
             continue
 
         data_source.append(info_dict)
-    for data in data_source:
-        try:
-            insertDynamic(data)
-        except:
-            continue
+    # for data in data_source:
+    #     try:
+    #         insertDynamic(data)
+    #     except:
+    #         continue
