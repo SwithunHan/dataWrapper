@@ -125,14 +125,14 @@ class Dynamic(models.Model):
     title = models.CharField(max_length=255, verbose_name='动态标题')
     url = models.CharField(max_length=255, verbose_name='动态链接')
     source = models.CharField(max_length=50, verbose_name='动态来源')
-    date_time = models.CharField(max_length=100, verbose_name='动态发布时间')
+    date_time = models.CharField(max_length=100, verbose_name='动态发布时间',primary_key=True)
 
 
 class Web_sign_new(models.Model):
     """
     网签最新数据
     """
-    Date = models.DateTimeField(verbose_name='日期')
+    Date = models.DateTimeField(verbose_name='日期',primary_key=True)
     House_num = models.IntegerField(verbose_name='网上签约数量')
     House_square = models.IntegerField(verbose_name='网上签约面积')
     Online_num = models.IntegerField(verbose_name='住宅签约数量')
@@ -140,7 +140,7 @@ class Web_sign_new(models.Model):
 
 
 class Web_sign_old(models.Model):
-    Date = models.DateTimeField(verbose_name='日期')
+    Date = models.DateTimeField(verbose_name='日期',primary_key=True)
     Online_num = models.IntegerField(verbose_name='住宅签约数量')
 
 
