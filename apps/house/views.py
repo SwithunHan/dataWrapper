@@ -1,7 +1,6 @@
 import datetime
 import json
 import re
-from pure_pagination import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth import get_user_model
 from django.db.models import Count, Q, Max, Min, Avg
 from django.http import HttpResponse
@@ -32,6 +31,13 @@ class HousePagination(PageNumberPagination):
     page_size_query_param = 'page_size'
     page_query_param = "page"
     max_page_size = 100
+
+
+class InfoPagination(PageNumberPagination):
+    page_size = 5
+    page_size_query_param = 'page_size'
+    page_query_param = "page"
+    max_page_size = 5
 
 
 # Create your views here.
@@ -190,7 +196,7 @@ class DynamicViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Dynamic.objects.all().order_by('-date_time')
     # print(queryset)
     serializer_class = DynamicSerializer
-    pagination_class = HousePagination
+    pagination_class = InfoPagination
 
 
 # 网签最新数据展示，完成
@@ -210,7 +216,6 @@ class Web_sign_oldViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 # 装修情况和数量分析 完成
 class DecorationCountViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Houseinfo.objects.values('decoration').annotate(value=Count('decoration'))
-    print(queryset)
     serializer_class = DecorationCountSerializer
     pagination_class = HousePagination
 
@@ -233,13 +238,11 @@ class FloorCountViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 # 各区域每平方米房价对比   每平方米房价取平均值  (连表查询)
 class DistrictUtilPriceViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     queryset = Houseinfo.objects.values('community__district').annotate(value=Avg('unitPrice'))
-    print(queryset)
     serializer_class = DistrictUtilPriceSerializer
     pagination_class = HousePagination
 
 # 二手房总价对比
-class DistrictUtilPriceViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
-    queryset = Houseinfo.objects.values('community__district').annotate(value=Avg('unitPrice'))
-    print(queryset)
-    serializer_class = DistrictUtilPriceSerializer
-    pagination_class = HousePagination
+# class DistrictUtilPriceViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+#     queryset = Houseinfo.objects.values('community__district').annotate(value=Avg('unitPrice'))
+#     serializer_class = DistrictUtilPriceSerializer
+#     pagination_class = HousePagination
