@@ -24,7 +24,7 @@ pandas==0.24.2
 pipreqs==0.4.9
 post==2019.3.22
 public==2019.3.22
-PyJWT==1.7.1
+PyJWT==2.4.0
 python-dateutil==2.8.0
 pytz==2018.9
 query-string==2019.3.22
